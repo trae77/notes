@@ -1,54 +1,38 @@
-let db = require('../Develop/db/db.json');
+let db = require('../db/db.json');
+const {v4:uuidv4} = require("uuid");
 const fs = require('fs');
 
 module.exports = (app) => {
 
-    app.get("/api/notes", (req, res) => {
-        console.table(db)
-       fs.readFileSync(db, "utf-8"), (err) => {
-            if (err) throw err;
+app.get("/api/notes", (req, res) => {
            
-             res.JSON(db)
+    res.json(db);
          
-        }
+});
 
-    });
 
 
 app.post('/api/notes', (req, res) => {
 
-    let newNote = req.body;
-     let i = 1
+    const newNote = req.body;
  
-    newNote.id = i
-
-  
-    let db = (fs.readFileSync(db, "utf8"));
-
+    newNote.id = uuidv4();
 
     db.push(newNote)
     
- 
-    fs.writeFileSync(db, JSON.stringify(db));
+    fs.writeFileSync('./db/db.json', JSON.stringify(db));
 
-
-    res.json(NewNotes);
-    i++
+    res.json(db);
+    
 })
-app.delete("/api/notes:id", (req, res) => {
+app.delete("/api/notes/:id", (req, res) => {
 
+    const deleteNotes = req.params.id;
   
-    let deleteNotes = req.params.id;
+    db = db.filter(placeHolder => placeHolder.id !== deleteNotes);
 
-   
-    let notes = (fs.readFileSync(db, "utf8"));
+    fs.writeFileSync('./db/db.json', JSON.stringify(db));
 
-  
-    const newNotes = notes.filter(placeHolder => placeHolder.id !== deleteNotes)
-
-
-    fs.writeFileSync(db, JSON.stringify(newNotes))
-
-    res.json(newNotes)
+    res.json(db);
 })
  }
